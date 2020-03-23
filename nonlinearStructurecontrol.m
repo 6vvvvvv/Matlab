@@ -1,9 +1,9 @@
-%%%%%%%%%%%%%%·ÇÏßĞÔ½¨Öş½á¹¹·Ç¹â»¬¿ØÖÆ%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%non-smooth control on structural vibration%%%%%%%%%%%%%%%%%%%
 % clear;
 close all;
 clc;
 t=0.02;
-%1¡¢³õÊ¼Öµ
+%1ã€initial value
 M=3.456*10^5*eye(8);
 % M=zeros(8,8);
 % for iM=1:1:8
@@ -54,7 +54,7 @@ z1=zeros(8,buchanglong/t);%x
 z2=zeros(8,buchanglong/t);%v
 z3=zeros(8,buchanglong/t);%dx
 dv=[0 0 0 0 0 0 0 0]';
-%%%%%%%%%%%%%%%%%%%%LQRËã·¨×´Ì¬%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%LQRç®—æ³•çŠ¶æ€%%%%%%%%
 
 u1=zeros(8,buchanglong/t);
 z11=zeros(8,buchanglong/t);%x
@@ -65,7 +65,7 @@ dv1=[0 0 0 0 0 0 0 0]';
 % z=[z1,z2,z3]';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%ÎŞ¿Ø×´Ì¬%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%no control status%%%%%%%%
 
 u2=zeros(8,buchanglong/t);
 z12=zeros(8,buchanglong/t);%x
@@ -75,7 +75,7 @@ accWukong=zeros(8,buchanglong/t);
 dv2=[0 0 0 0 0 0 0 0]';
 % z=[z1,z2,z3]';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-A1=1.0;beta1=0.5;n1=95;gama1=0.5;%%%%%%%%%%%%·ÇÏßĞÔ»·½Ú²ÎÊı
+A1=1.0;beta1=0.5;n1=95;gama1=0.5;%%%%%%%%%%%% non-linear parameter
 
 
 
@@ -84,8 +84,8 @@ Dy=[Dy1 Dy2 Dy3 Dy4 Dy5 Dy6 Dy7 Dy8]';
 
 % for j=1:1:8
     for i=2:1:buchanglong/t
-%%%%%%%%%%%%%%ÊıÑ§Ä£ĞÍ%%%%%%%%%%%%%%%%%%%%%%
-ddXg(i)=acc2(i);%sin(t);%%%ÕıÏÒÄ£ÄâµØÕğ²¨%%%%%
+%%%%%%%%%%%%%%math model%%%%%%%%%%%%%%%%%%%%%%
+ddXg(i)=acc2(i);%sin(t);%%%seismic wave from file a%%%%%
 
 z1(:,i)=z1(:,i-1)+z3(:,i-1)*t;
 % z2(:,i)=;
@@ -97,30 +97,30 @@ for j=1:1:8
     %inline('Dy(j)^(-1)*(A1*dx(j)-beta1*abs(dx(j))*abs(v(j))^(n1-1)*v(j)-gama1*dx(j)*abs(v(j))^n1)');
 %     dx(j)=z3(j,i);
 %     v(j)=z2(j,i);
- % v=[v1,v2,v3,v4,v5,v6,v7,v8];
+% v=[v1,v2,v3,v4,v5,v6,v7,v8];
 %     kk1=feval(dv(j),dx(j),v(j));
 %     kk2=feval(dv(j),dx(j)+t/2,v(j)+(t*kk1)/2);
 %     kk3=feval(dv(j),dx(j)+t/2,v(j)+(t*kk2)/2);
 %     kk4=feval(dv1,dx(j)+t,v(j)+t*kk3);
-%     dv(j)=(t/6)*(kk1+2*kk2+2*kk3+kk4);%%%%¸Ğ¾õºÃÏñ²»¶Ô
+%     dv(j)=(t/6)*(kk1+2*kk2+2*kk3+kk4);
 end
 z2(:,i)=z2(:,i-1)+dv*t;
 
 
 z=[z1(:,i-1)' z2(:,i-1)' z3(:,i-1)']';
 z3(:,i)=z3(:,i-1)+([-inv(M)*Ke -inv(M)*KI -inv(M)*C]*z-I0*ddXg(i)+inv(M)*H*u(:,i-1))*t;
-%%%%%%%%%%%%·Ç¹â»¬¿ØÖÆËã·¨%%%%%%%%%%%%%%%%%Ğ´³ö±ä»»ºóµÄ¿ØÖÆ·½³Ì¼´¿É
+%%%%%%%%%%%%non smooth control algorithm%%%%%%%%%%%%%%%%%
 kNonsmooth1=3;kNonsmooth2=2;a1=0.43;a2=0.6;
 fai(:,i)=-kNonsmooth1.*sign(z1(:,i)).*(abs(z1(:,i))).^a1-kNonsmooth2.*sign(z3(:,i)).*(abs(z3(:,i))).^a2;
 
 
-%%%%%%%%%%%%Äæ±ä»»%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%inverse transform%%%%%%%%%%%%%%%%%%%%
 S_mao=[-inv(M)*Ke -inv(M)*KI -inv(M)*C];
 u(:,i)=inv(H)*M*(fai(:,i)-S_mao*z+I0*ddXg(i));
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LQRÊıÑ§Ä£ĞÍ%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LQR mathematical model%%%%%%%%%%%%%%%%%%%%%%%%%
 z11(:,i)=z11(:,i-1)+z31(:,i-1)*t;
 % z2(:,i)=;
 
@@ -149,7 +149,7 @@ G=lqr(A,B,Q,R);
 u1(:,i)=-G*[z11(:,i)' z31(:,i)']';
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ÎŞ¿ØÊıÑ§Ä£ĞÍ%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%no control mathematical model%%%%%%%%%%%%%%%%%%%%%%%%%
 z12(:,i)=z12(:,i-1)+z32(:,i-1)*t;
 % v2=zeros(8,1);
 for j=1:1:8
@@ -196,7 +196,7 @@ accWukong(:,i)=[-inv(M)*Ke -inv(M)*KI -inv(M)*C]*zWukong-I0*ddXg(i);
     end
 % end
 
-%%%%%%%%%%·ÂÕæ%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%simulation%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure(1)
     plot([0.02:0.02:buchanglong],u(1,:),'k','linewidth',1.5)
@@ -282,18 +282,18 @@ for i=1:1:8
      table1(i,9)=(1-max(abs(z1(i,:)))/max(abs(z11(i,:))))*100;
      table1(i,10)=(1-max(abs(fai(i,:)))/max(abs(accLQR(i,:))))*100;
 end
-fprintf('½á¹û¾ØÕó£¬µÚÒ»ÁĞÎªÂ¥²ãÊı,µÚ¶şÁĞÎªDy£¬µÚÈıÁĞÎªÎŞ¿ØÎ»ÒÆ×î´ó£¬µÚËÄÁĞÎªÎŞ¿Ø¼ÓËÙ¶È×î´ó£¬µÚÎåÁĞÎªLQRÎ»ÒÆ×î´ó£¬µÚÁùÁĞÎªLQR¼ÓËÙ¶È×î´ó,µÚÆßÁĞÎª·Ç¹â»¬Î»ÒÆ×î´ó£¬µÚ°ËÁĞÎª·Ç¹â»¬¼ÓËÙ¶È×î´ó')
+fprintf('resultï¼Œ1st col floor, 2nd col Dy, 3rd col max displacement under no control, 4th col max acc under no control, 5th max displacement LQR, 6th col max acc under no control, 7th max displacement non smooth, 8th col max acc under no control')
 table1
-fprintf('·Ç¹â»¬×î´ó¿ØÖÆÁ¦')
+fprintf('max control force under non smooth')
 round(max(max(u))/10^3)
-fprintf('LQR×î´ó¿ØÖÆÁ¦')
+fprintf('max control force under LQR')
 round(max(max(u1))/10^3)
 
 % 
-fprintf('Î»ÒÆÌáÉı°Ù·Ö±È')
+fprintf('percentage of displacement')
 table1(:,9)
 
-fprintf('¼ÓËÙ¶ÈÌáÉı°Ù·Ö±È')
+fprintf('percentage of acc')
 table1(:,10)
 
 
