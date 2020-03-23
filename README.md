@@ -2,6 +2,8 @@
 
 ## Pls check out the presentation pdf
 
-![image](https://github.com/6vvvvvv/Neuroscience_Centipede/blob/master/presentation.jpg)
+## Model prototype
 
-![image](https://github.com/6vvvvvv/Neuroscience_Centipede/blob/master/presentation.jpg)
+![image](https://github.com/6vvvvvv/Matlab_non_smooth_control/blob/master/vibration%20model.jpg)
+
+![image](https://github.com/6vvvvvv/Matlab_non_smooth_control/blob/master/vibration%20model2.jpg)
